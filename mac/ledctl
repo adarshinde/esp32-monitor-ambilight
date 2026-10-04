@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SOCK="/tmp/esp32ctl.sock"
+PYTHON3="/Users/adarsh/.pyenv/versions/3.12.13/bin/python3"  # explicit path: callers via launchd (e.g. the menu bar app) have a minimal PATH without pyenv shims
+
+usage() {
+  echo "Usage: ledctl <command>"
+  echo ""
+  echo "  ledctl mode 1     # Color Wave (smooth slow single-color cycle)"
+  echo "  ledctl mode 2     # Diagonal Chase"
+  echo "  ledctl mode 3     # Gradient Wave (multi-color, similar hue range)"
+  echo "  ledctl mode 4     # Aurora (flowing organic multi-color)"
+  echo "  ledctl mode 5     # Breathing Pulse"
+  echo "  ledctl mode 6     # Ambilight (auto-starts screen_sync.py)"
+  echo "  ledctl mode 7     # Warm White (3000K)"
+  echo "  ledctl on"
+  echo "  ledctl off"
+  echo "  ledctl status"
+  exit 1
+}
+
+send() {
+  if [ ! -S "$SOCK" ]; then
+    echo "esp32_helper isn't running (no socket at $SOCK)" >&2
+    exit 1
+  fi
+  echo "$1" | nc -U "$SOCK" -w 2
+}
+
+[ $# -ge 1 ] || usage
+
+case "$1" in
+  mode)
+    [ $# -eq 2 ] || usage
+    if [ "$2" = "6" ]; then
+      if ! pgrep -f "screen_sync.py" > /dev/null; then
+        nohup "$PYTHON3" "$HOME/esp32_rgb_loop/screen_sync.py" >> "$HOME/Library/Logs/screen_sync.log" 2>&1 &
+        disown
+      fi
+    else
+      pkill -f "screen_sync.py" 2>/dev/null || true
+    fi
+    send "MODE $2"
+    ;;
+  on)
+    send "ON"
+    ;;
+  off)
+    send "OFF"
+    ;;
+  status)
+    send "STATUS"
+    ;;
+  *)
+    usage
+    ;;
+esac

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.adarsh.esp32menubar</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/adarsh/.pyenv/versions/3.12.13/bin/python3</string>
+        <string>-u</string>
+        <string>/Users/adarsh/esp32_rgb_loop/menubar_app.py</string>
+    </array>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>/Users/adarsh/Library/Logs/esp32menubar.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/adarsh/Library/Logs/esp32menubar.log</string>
+</dict>
+</plist>
